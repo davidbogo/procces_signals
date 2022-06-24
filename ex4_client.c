@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_SLEEP_TIMES 11
+#define COUNT_LIMIT 10
+#define DECIMAL 10
 int run = 1;
 
 char* itoa(int val, int base){
@@ -58,7 +61,7 @@ void client_handler(int siguser2)
     int my_pid, open_client;
     alarm(0);
     my_pid = getpid();
-    strcpy(pid_char, itoa(my_pid, 10));
+    strcpy(pid_char, itoa(my_pid, DECIMAL));
     strcat(pid_char, ".txt");
     strcat(to_client, pid_char);
     open_client = open(to_client, O_RDONLY);
@@ -85,31 +88,29 @@ int main(int argc, char** argv)
     char operator[512];
     char second_param[512];
     int count_open_tries = 0;
-    int get_random;
-    int random_num, random_sleep;
+    int random_sleep;
+    size_t random_num;
     int client;
     if (argc != 5) {
-        printf("ERROR_FROM_EX4 no args\n");
+        printf("ERROR_FROM_EX4\n");
+        return -1;
+    }
+    if ((atoi(argv[3]) > 4) || (atoi(argv[3]) < 1)) {
+        printf("ERROR_FROM_EX4\n");
         return -1;
     }
     strcpy(srv_id, argv[1]);
     strcpy(first_param, argv[2]);
     strcpy(operator, argv[3]);
     strcpy(second_param, argv[4]);
-    while(count_open_tries < 11) {
+    while(count_open_tries < MAX_SLEEP_TIMES) {
         int to_srv_open;
         to_srv_open = open("to_srv.txt",  O_WRONLY | O_CREAT | O_EXCL , 0666);
         if (to_srv_open < 0) {
             if (errno == EEXIST) {
                 count_open_tries++;
                 if (count_open_tries < 11) {
-                    get_random = getrandom(&random_num, sizeof(random_num), GRND_RANDOM);
-                    if (get_random < 0) {
-                        printf("ERROR_FROM_EX4\n");
-                        return -1;
-                    }
-                    if (random_num < 0)
-                        random_num = -random_num;
+                    getrandom(&random_num, sizeof(random_num), GRND_RANDOM);
                     random_sleep = ((random_num % 5) + 1);
                     sleep(random_sleep);
                 }
@@ -120,7 +121,7 @@ int main(int argc, char** argv)
             }
         }
         client = getpid();
-        strcpy(client_id, itoa(client, 10));
+        strcpy(client_id, itoa(client, DECIMAL));
         strcpy(write_char, client_id);
         strcat(write_char, "\n");
         strcat(write_char, first_param);
@@ -133,11 +134,11 @@ int main(int argc, char** argv)
         write(to_srv_open, write_char, strlen(write_char));
         close(to_srv_open);
         kill((pid_t)(atoi(srv_id)), SIGUSR1);
-        alarm(3);
+        alarm(30);
         pause();
         break;
     }
-    if (count_open_tries > 10) {
+    if (count_open_tries > COUNT_LIMIT) {
         printf("no available 'to_srv' file for me. I'm done!\n");
         return -1;
     }

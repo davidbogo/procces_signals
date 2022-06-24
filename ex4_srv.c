@@ -10,6 +10,7 @@
 #include <string.h>
 #include <signal.h>
 
+#define DECIMAL 10
 int run = 1;
 
 char* itoa(int val, int base){
@@ -87,35 +88,29 @@ void srv_handler(int siguser1)
                 first_num = atoi(first_param);
                 second_num = atoi(second_param);
                 num_result = (first_num + second_num);
-                strcat(result, itoa(num_result, 10));
+                strcat(result, itoa(num_result, DECIMAL));
                 break;
             case '2':
                 first_num = atoi(first_param);
                 second_num = atoi(second_param);
                 num_result = (first_num - second_num);
-                strcat(result, itoa(num_result, 10));
+                strcat(result, itoa(num_result, DECIMAL));
                 break;
             case '3':
                 first_num = atoi(first_param);
                 second_num = atoi(second_param);
                 num_result = (first_num * second_num);
-                strcat(result, itoa(num_result, 10));
+                strcat(result, itoa(num_result, DECIMAL));
                 break;
-            case'4':
+            default:
                 if (atoi(second_param) == 0) {
                     strcat(result, "you can't devide by zero!");
                 } else {
                     first_num = atoi(first_param);
                     second_num = atoi(second_param);
                     num_result = (first_num / second_num);
-                    strcat(result, itoa(num_result, 10));
+                    strcat(result, itoa(num_result, DECIMAL));
                 }
-                break;
-            default:
-                printf("ERROR_FROM_EX4\n");
-                raise(SIGTERM);
-                raise(SIGKILL);
-                
             }
             write(open_client, result, strlen(result));
             close(open_client);
@@ -127,7 +122,7 @@ void srv_handler(int siguser1)
         }
         case -1:
             printf("ERROR_FROM_EX4\n");
-            return -1;
+            run = 0;
         default:
             signal(SIGCHLD, SIG_IGN);
             signal(SIGUSR1, srv_handler);
@@ -142,7 +137,7 @@ int main()
     
     remove("to_srv.txt"); //don't care if it fails. It should!
     while(run) {
-        alarm(6);
+        alarm(60);
         pause();
     }
     return -1;
