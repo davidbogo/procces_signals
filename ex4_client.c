@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+int run = 1;
+
 char* itoa(int val, int base){
 	
 	static char buf[32] = {0};
@@ -44,8 +46,7 @@ void readfileline(int fd, char *buf, size_t buf_len)
 void alarm_handler(int alarm)
 {
     printf("Client closed because no response was received from the server for 30 seconds\n");
-    raise(SIGTERM);
-    raise(SIGKILL);
+    run = 0;
 }
 
 void client_handler(int siguser2)
@@ -104,17 +105,17 @@ int main(int argc, char** argv)
                 if (count_open_tries < 11) {
                     get_random = getrandom(&random_num, sizeof(random_num), GRND_RANDOM);
                     if (get_random < 0) {
-                        printf("ERROR_FROM_EX4 cant\n");
+                        printf("ERROR_FROM_EX4\n");
                         return -1;
                     }
-                    if (random_sleep < 0)
-                        random_sleep = -random_sleep;
+                    if (random_num < 0)
+                        random_num = -random_num;
                     random_sleep = ((random_num % 5) + 1);
                     sleep(random_sleep);
                 }
                 continue;
             } else {
-                printf("ERROR_FROM_EX4 wont\n");
+                printf("ERROR_FROM_EX4\n");
                 return -1;
             }
         }
@@ -132,12 +133,15 @@ int main(int argc, char** argv)
         write(to_srv_open, write_char, strlen(write_char));
         close(to_srv_open);
         kill((pid_t)(atoi(srv_id)), SIGUSR1);
-        alarm(30);
+        alarm(3);
         pause();
         break;
     }
     if (count_open_tries > 10) {
         printf("no available 'to_srv' file for me. I'm done!\n");
+        return -1;
+    }
+    if (!run) {
         return -1;
     }
     return 0;

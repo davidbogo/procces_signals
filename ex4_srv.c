@@ -8,6 +8,9 @@
 #include <strings.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+
+int run = 1;
 
 char* itoa(int val, int base){
 	
@@ -42,8 +45,7 @@ void readfileline(int fd, char *buf, size_t buf_len)
 void alarm_handler(int alarm)
 {
     printf("The server was closed because no service request was received for the last 60 seconds\n");
-    raise(SIGTERM);
-    raise(SIGKILL);
+    run = 0;
 }
 
 void srv_handler(int siguser1)
@@ -62,10 +64,9 @@ void srv_handler(int siguser1)
             char result[512] = "";
             int open_to_srv, open_client, first_num, second_num, num_result, client_id;
             // We're the child
-            sleep(10);
             open_to_srv = open("to_srv.txt", O_RDONLY);
             if (open_to_srv < 0) {
-                printf("ERROR_FROM_EX4 her\n");
+                printf("ERROR_FROM_EX4\n");
                 raise(SIGTERM);
                 raise(SIGKILL);
             }
@@ -111,7 +112,7 @@ void srv_handler(int siguser1)
                 }
                 break;
             default:
-                printf("ERROR_FROM_EX4 there \n");
+                printf("ERROR_FROM_EX4\n");
                 raise(SIGTERM);
                 raise(SIGKILL);
                 
@@ -125,9 +126,8 @@ void srv_handler(int siguser1)
             break;
         }
         case -1:
-            printf("ERROR_FROM_EX4 bor\n");
-            raise(SIGTERM);
-            raise(SIGKILL);
+            printf("ERROR_FROM_EX4\n");
+            return -1;
         default:
             signal(SIGCHLD, SIG_IGN);
             signal(SIGUSR1, srv_handler);
@@ -141,8 +141,9 @@ int main()
     signal(SIGALRM, alarm_handler);
     
     remove("to_srv.txt"); //don't care if it fails. It should!
-    while(1) {
-        alarm(60);
+    while(run) {
+        alarm(6);
         pause();
     }
+    return -1;
 }
