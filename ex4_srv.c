@@ -10,21 +10,18 @@
 #include <string.h>
 #include <signal.h>
 
+//David Bogoslavsky 316393974
+
 #define DECIMAL 10
 int run = 1;
 
 char* itoa(int val, int base){
 	
 	static char buf[32] = {0};
-	
-	int i = 30;
-	
-	for(; val && i ; --i, val /= base)
-	
+        int i;
+	for(i = 30; val && i ; --i, val /= base)
 		buf[i] = "0123456789abcdef"[val % base];
-	
-	return &buf[i+1];
-	
+	return &buf[i+1];	
 }
 
 void readfileline(int fd, char *buf, size_t buf_len)

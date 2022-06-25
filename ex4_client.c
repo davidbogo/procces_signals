@@ -11,6 +11,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+//David Bogoslavsky 316393974
+
 #define MAX_SLEEP_TIMES 11
 #define COUNT_LIMIT 10
 #define DECIMAL 10
@@ -19,15 +21,10 @@ int run = 1;
 char* itoa(int val, int base){
 	
 	static char buf[32] = {0};
-	
-	int i = 30;
-	
-	for(; val && i ; --i, val /= base)
-	
+        int i;
+	for(i = 30; val && i ; --i, val /= base)
 		buf[i] = "0123456789abcdef"[val % base];
-	
 	return &buf[i+1];
-	
 }
 
 void readfileline(int fd, char *buf, size_t buf_len)
@@ -80,13 +77,13 @@ int main(int argc, char** argv)
     signal(SIGUSR2, client_handler);
     signal(SIGALRM, alarm_handler);
     
-    char srv_id[512];
+    char *srv_id = argv[1];
+    char *first_param = argv[2];
+    char *operator = argv[3];
+    char *second_param = argv[4];
     char to_client[512] = "to_client_";
     char write_char[512];
     char client_id[512];
-    char first_param[512];
-    char operator[512];
-    char second_param[512];
     int count_open_tries = 0;
     int random_sleep;
     size_t random_num;
@@ -99,10 +96,6 @@ int main(int argc, char** argv)
         printf("ERROR_FROM_EX4\n");
         return -1;
     }
-    strcpy(srv_id, argv[1]);
-    strcpy(first_param, argv[2]);
-    strcpy(operator, argv[3]);
-    strcpy(second_param, argv[4]);
     while(count_open_tries < MAX_SLEEP_TIMES) {
         int to_srv_open;
         to_srv_open = open("to_srv.txt",  O_WRONLY | O_CREAT | O_EXCL , 0666);
