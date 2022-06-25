@@ -18,11 +18,13 @@
 #define DECIMAL 10
 int run = 1;
 
+#define MAX_DIGITS_TO_CONVERT   30
+
 char* itoa(int val, int base){
 	
 	static char buf[32] = {0};
         int i;
-	for(i = 30; val && i ; --i, val /= base)
+	for(i = MAX_DIGITS_TO_CONVERT; i && (val || (i == MAX_DIGITS_TO_CONVERT)) ; --i, val /= base)
 		buf[i] = "0123456789abcdef"[val % base];
 	return &buf[i+1];
 }
