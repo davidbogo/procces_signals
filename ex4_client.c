@@ -20,13 +20,13 @@ int run = 1;
 
 #define MAX_DIGITS_TO_CONVERT   30
 
-char* itoa(int val, int base){
-	
-	static char buf[32] = {0};
-        int i;
-	for(i = MAX_DIGITS_TO_CONVERT; i && (val || (i == MAX_DIGITS_TO_CONVERT)) ; --i, val /= base)
-		buf[i] = "0123456789abcdef"[val % base];
-	return &buf[i+1];
+static char itoa_res[32];
+
+const char* itoa(int val)
+{   // The function is non-re-entrant since it uses a static buffer, but
+    // this is good enough for this task
+    sprintf(itoa_res, "%d", val);
+    return itoa_res;
 }
 
 void readfileline(int fd, char *buf, size_t buf_len)
@@ -60,7 +60,7 @@ void client_handler(int siguser2)
     int my_pid, open_client;
     alarm(0);
     my_pid = getpid();
-    strcpy(pid_char, itoa(my_pid, DECIMAL));
+    strcpy(pid_char, itoa(my_pid));
     strcat(pid_char, ".txt");
     strcat(to_client, pid_char);
     open_client = open(to_client, O_RDONLY);
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
             }
         }
         client = getpid();
-        strcpy(client_id, itoa(client, DECIMAL));
+        strcpy(client_id, itoa(client));
         strcpy(write_char, client_id);
         strcat(write_char, "\n");
         strcat(write_char, first_param);

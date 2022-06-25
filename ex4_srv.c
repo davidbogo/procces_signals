@@ -15,15 +15,13 @@
 #define DECIMAL 10
 int run = 1;
 
-#define MAX_DIGITS_TO_CONVERT   30
+static char itoa_res[32];
 
-char* itoa(int val, int base){
-	
-	static char buf[32] = {0};
-        int i;
-	for(i = MAX_DIGITS_TO_CONVERT; i && (val || (i == MAX_DIGITS_TO_CONVERT)) ; --i, val /= base)
-		buf[i] = "0123456789abcdef"[val % base];
-	return &buf[i+1];	
+const char* itoa(int val)
+{   // The function is non-re-entrant since it uses a static buffer, but
+    // this is good enough for this task
+    sprintf(itoa_res, "%d", val);
+    return itoa_res;
 }
 
 void readfileline(int fd, char *buf, size_t buf_len)
@@ -87,19 +85,19 @@ void srv_handler(int siguser1)
                 first_num = atoi(first_param);
                 second_num = atoi(second_param);
                 num_result = (first_num + second_num);
-                strcat(result, itoa(num_result, DECIMAL));
+                strcat(result, itoa(num_result));
                 break;
             case '2':
                 first_num = atoi(first_param);
                 second_num = atoi(second_param);
                 num_result = (first_num - second_num);
-                strcat(result, itoa(num_result, DECIMAL));
+                strcat(result, itoa(num_result));
                 break;
             case '3':
                 first_num = atoi(first_param);
                 second_num = atoi(second_param);
                 num_result = (first_num * second_num);
-                strcat(result, itoa(num_result, DECIMAL));
+                strcat(result, itoa(num_result));
                 break;
             default:
                 if (atoi(second_param) == 0) {
@@ -108,7 +106,7 @@ void srv_handler(int siguser1)
                     first_num = atoi(first_param);
                     second_num = atoi(second_param);
                     num_result = (first_num / second_num);
-                    strcat(result, itoa(num_result, DECIMAL));
+                    strcat(result, itoa(num_result));
                 }
             }
             write(open_client, result, strlen(result));
