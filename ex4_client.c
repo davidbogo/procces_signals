@@ -1,4 +1,3 @@
-#include <sys/random.h>
 #include <linux/random.h>
 #include <errno.h>
 #include <stdio.h>
@@ -105,7 +104,7 @@ int main(int argc, char** argv)
             if (errno == EEXIST) {
                 count_open_tries++;
                 if (count_open_tries < 11) {
-                    getrandom(&random_num, sizeof(random_num), GRND_RANDOM);
+                    random_num = rand();
                     random_sleep = ((random_num % 5) + 1);
                     sleep(random_sleep);
                 }
