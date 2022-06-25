@@ -63,7 +63,7 @@ void client_handler(int siguser2)
     strcat(to_client, pid_char);
     open_client = open(to_client, O_RDONLY);
     readfileline(open_client, result, sizeof(result));
-    printf("the result is: %s\n", result);
+    printf("%s\n", result);
     close(open_client);
     if (remove(to_client) < 0) {
         printf("ERROR_FROM_EX4 client\n");
