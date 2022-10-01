@@ -10,7 +10,7 @@
 #include <string.h>
 #include <signal.h>
 
-//David Bogoslavsky 316393974
+//David Bogoslavsky
 
 #define DECIMAL 10
 int run = 1;
