@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-//David Bogoslavsky 316393974
+//David Bogoslavsky
 
 #define MAX_SLEEP_TIMES 11
 #define COUNT_LIMIT 10
